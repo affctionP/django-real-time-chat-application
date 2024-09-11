@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import *
+from accounts.models import User
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 

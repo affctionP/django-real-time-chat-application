@@ -22,7 +22,7 @@
         <div style="height: 50%; width: 50%; background-color: paleturquoise;">
             {% for user in all_user %}
                 <hr/>
-            <h3 style="margin-left: 3px;">🧑 {{user.username| title}}
+            <h3 style="margin-left: 3px;">🧑 {{user.name}}
                 <small><button style="background-color: rgb(164, 114, 211); margin-left: 8px;"><a href="{% url 'create_friend' %}?id={{user.id}}" style="text-decoration: none; color: white;"><strong> Add Friend</strong></a></button></small>
             </h3>
             {% endfor %}

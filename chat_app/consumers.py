@@ -28,7 +28,14 @@ MESSAGE_TYPE = {
     "ALL_MESSAGE_READ": 'ALL_MESSAGE_READ',
     "ERROR_OCCURED": 'ERROR_OCCURED'
 }
+#Every consumer instance has an automatically generated unique channel name, and so can be communicated with via a channel layer.
 
+"""
+In our chat application we want to have multiple instances of ChatConsumer 
+in the same room communicate with each other. To do that we will have each ChatConsumer add 
+its channel to a group whose name is based on the room name. That will allow ChatConsumers to transmit
+ messages to all other ChatConsumers in the same room.
+"""
 class PersonalConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -64,7 +71,7 @@ class PersonalConsumer(AsyncWebsocketConsumer):
                     f'personal__{room_id}',
                     {
                     'type': 'user_online',
-                    'user_name' : self.user.username
+                    'user_email' : self.user.email
                     }
                 )
         elif msg_type == MESSAGE_TYPE['WENT_OFFLINE']:
@@ -74,14 +81,14 @@ class PersonalConsumer(AsyncWebsocketConsumer):
                     f'personal__{room_id}',
                     {
                     'type': 'user_offline',
-                    'user_name' : self.user.username
+                    'user_email' : self.user.email
                     }
                 )
             
     async def user_online(self,event):
         await self.send(text_data=json.dumps({
             'msg_type': MESSAGE_TYPE['WENT_ONLINE'],
-            'user_name' : event['user_name']
+            'user_email' : event['user_email']
         }))
         
     async def message_counter(self, event):
@@ -95,7 +102,7 @@ class PersonalConsumer(AsyncWebsocketConsumer):
     async def user_offline(self,event):
         await self.send(text_data=json.dumps({
             'msg_type': MESSAGE_TYPE['WENT_OFFLINE'],
-            'user_name' : event['user_name']
+            'user_email' : event['user_email']
         }))
     
     @database_sync_to_async
@@ -104,7 +111,7 @@ class PersonalConsumer(AsyncWebsocketConsumer):
         user_all_friends = ChatSession.objects.filter(Q(user1 = self.user) | Q(user2 = self.user))
         user_id = []
         for ch_session in user_all_friends:
-            user_id.append(ch_session.user2.id) if self.user.username == ch_session.user1.username else user_id.append(ch_session.user1.id)
+            user_id.append(ch_session.user2.id) if self.user.email == ch_session.user1.email else user_id.append(ch_session.user1.id)
         return user_id
 
     @database_sync_to_async
@@ -113,7 +120,7 @@ class PersonalConsumer(AsyncWebsocketConsumer):
         user_all_friends = ChatSession.objects.filter(Q(user1 = self.user) | Q(user2 = self.user))
         user_id = []
         for ch_session in user_all_friends:
-            user_id.append(ch_session.user2.id) if self.user.username == ch_session.user1.username else user_id.append(ch_session.user1.id)
+            user_id.append(ch_session.user2.id) if self.user.email == ch_session.user1.email else user_id.append(ch_session.user1.id)
         return user_id
 
     @database_sync_to_async
@@ -140,7 +147,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 "msg_type": MESSAGE_TYPE['ERROR_OCCURED'],
                 "error_message": MESSAGE_ERROR_TYPE["UN_AUTHENTICATED"],
-                "user": self.user.username,
+                "user": self.user.email,
             }))
             await self.close(code=4001)
 
@@ -266,8 +273,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "msg": message,
             "read": False,
             "timestamp": str(datetime.now()),
-            session_inst.user1.username: False,
-            session_inst.user2.username: False
+            session_inst.user1.email: False,
+            session_inst.user2.email: False
         }
         ChatMessage.objects.create(id = msg_id,chat_session=session_inst, user=self.user, message_detail=message_json)
         return session_inst.user2.id if self.user == session_inst.user1 else session_inst.user1.id

@@ -50,13 +50,13 @@
 
 <body>
     {% load convert_date %}
-    <h2>🧒 | {{opposite_user.username | title}}
+    <h2>🧒 | {{opposite_user.name | title}}
     </h2>
     <div>
         <div id="chat-log" class="scroll">
             {% for msg in fetch_all_message %}
             <p class="chat_box" id="{{msg.id}}">
-                <small> <b class="check_user">{{msg.user.username}}</b> - {{msg.message_detail.timestamp | convert_date | date:"M d'Y f"}}</small>
+                <small> <b class="check_user">{{msg.user.name}}</b> - {{msg.message_detail.timestamp | convert_date | date:"M d'Y f"}}</small>
                 <br/>
                 <span style="padding: 7px; color: #ffffff; font-weight: bold;"> • {{msg.message_detail.msg}}</span>
                 <br/>
@@ -85,7 +85,7 @@
     var send_all_read = () => {setTimeout(() => {
         chatSocket.send(JSON.stringify({
             'msg_type': 'ALL_MESSAGE_READ',
-            'user': '{{request.user.username}}'
+            'user': '{{request.user.email}}' //
         }));
         document.querySelector('title').textContent = "Chat Room"
     }, 1000)}
@@ -96,9 +96,9 @@
     messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
 
     const add_element = (data,box_color) => {        
-        const user = data.user === '{{request.user.username}}' ? "You" : data.user
+        const user = data.user === '{{request.user.email}}' ? "You" : data.user
         const error_msg = data.error_message === 'MESSAGE_OUT_OF_LENGTH' ? "<br/>" + "Error:Msg size must be less then 10 char." + "<br/>" + " • This Message not sent.." :false
-        const add_read = data.user === '{{request.user.username}}' ? '<small id="as_read" style="padding-left: 95%; color: #bbb8b8; font-weight: bold;">✔✔</small>':''
+        const add_read = data.user === '{{request.user.email}}' ? '<small id="as_read" style="padding-left: 95%; color: #bbb8b8; font-weight: bold;">✔✔</small>':''
         ele = `<p id=${data.msg_id} class="chat_box" style = "background-color : ${box_color};"><small><b>${user}</b> - ${data.timestampe}</small><br/><span style="color: #ffffff; font-weight: bold;""> • ${data.message}<small><br/>${error_msg ? error_msg :add_read }</small></span><br/></p>`
         document.querySelector('#chat-log').innerHTML += ele
         messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
@@ -115,7 +115,7 @@
                 }
             }
             else{
-                if (user_name !== '{{request.user.username}}') {
+                if (user_name !== '{{request.user.email}}') {
                     chatSocket.send(JSON.stringify({
                         'msg_type': 'MESSAGE_READ',
                         'msg_id': msg_id,
@@ -151,23 +151,23 @@
             check_read(data.user,data.msg_id)
         }
         else if(data.msg_type === 'MESSAGE_READ'){
-            if(data.user === '{{request.user.username}}'){
+            if(data.user === '{{request.user.name}}'){
                 setTimeout(() => { document.getElementById(data.msg_id).querySelector('#as_read').style.color = 'rgb(8, 255, 8)'}, 300);
             }
         }
         else if(data.msg_type === 'IS_TYPING'){
-            if(data.user !== '{{request.user.username}}'){
+            if(data.user !== '{{request.user.name}}'){
                 document.getElementById('chat-log').innerHTML += "<span id = 'isTyping'>Typing....</span>"
                 messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
             }
         }
         else if(data.msg_type === 'NOT_TYPING'){
-            if(data.user !== '{{request.user.username}}'){
+            if(data.user !== '{{request.user.name}}'){
                 document.getElementById('chat-log').removeChild(document.getElementById("isTyping")) 
             }
         }
         else if (data.msg_type === 'ALL_MESSAGE_READ') {
-            if (data.user !== '{{request.user.username}}') {
+            if (data.user !== '{{request.user.name}}') {
                 let check_all_read = document.querySelectorAll('#as_read')
                 for (let i = 0; i < check_all_read.length; i++) {
                     if (check_all_read[i].style.color !== 'rgb(8, 255, 8)') {
@@ -195,7 +195,7 @@
     function sendIsTypingToUser() {
         if(!isTyping){
             chatSocket.send(JSON.stringify({
-                'user': '{{request.user.username}}',
+                'user': '{{request.user.name}}',
                 'msg_type': 'IS_TYPING',
             }));
             isTyping = true
@@ -203,7 +203,7 @@
     }
     function sendIsNotTyping() {
         chatSocket.send(JSON.stringify({
-            'user': '{{request.user.username}}',
+            'user': '{{request.user.name}}',
             'msg_type': 'NOT_TYPING',
         }));
         isTyping = false
@@ -216,7 +216,7 @@
         chatSocket.send(JSON.stringify({
             'message': message,
             'msg_type' : 'TEXT_MESSAGE',
-            'user' : '{{request.user.username}}'
+            'user' : '{{request.user.name}}'
         }));
 
         messageInputDom.value = '';
@@ -224,7 +224,7 @@
 
     const check_user = document.querySelectorAll(".check_user")
     for (let i = 0; i < check_user.length; i++){
-        if (check_user[i].innerText === '{{request.user.username}}') {
+        if (check_user[i].innerText === '{{request.user.name}}') {
             check_user[i].innerText = 'You'
     }
     }

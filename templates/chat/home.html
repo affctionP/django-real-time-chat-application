@@ -8,7 +8,7 @@
     <h2>
         <b>
             {% if request.user.is_authenticated %}
-            Hello {{request.user.username}} : 
+            Hello {{request.user.name}} : 
             <a href="{% url 'friend_list' %}" style="text-decoration: none; color: rgb(255, 95, 2);"> My Chat List</a> 
             <span id = 'overall_unread' class="w3-badge w3-large w3-green w3-margin-right">{{unread_msg}}</span>
             {% else %}
