@@ -30,7 +30,7 @@ ALLOWED_HOSTS = []
 
 #====================================== IN Built applications ==========================
 INSTALLED_APPS = [
-    
+    'daphne',
     'channels',
     
     'django.contrib.admin',
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 # ================================= Internal Application =================================
 INSTALLED_APPS += [
     'chat_app.apps.ChatAppConfig',
+    'accounts.apps.AccountsConfig'
 ]
 
 # ================================ External Applications ==================================
@@ -90,17 +91,23 @@ ASGI_APPLICATION = "django_channel.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'DB_NAME',
+#         'USER' : 'USER_NAME',
+#         'PASSWORD' : '****',
+#         'HOST' : 'localhost',
+#         'PORT': '5432'
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'DB_NAME',
-        'USER' : 'USER_NAME',
-        'PASSWORD' : '****',
-        'HOST' : 'localhost',
-        'PORT': '5432'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -124,15 +131,18 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
+AUTH_USER_MODEL = 'accounts.User'
+
+
+
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'ASIA/KOLKATA'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -143,16 +153,29 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # ================================= Channel Settings ===========================
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('127.0.0.1', 6379)],
+#         },
+#     },
+# }
+
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
-        },
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+
     },
 }
 
 
-LOGIN_URL = '/api_auth/login'
-LOGOUT_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL = '/'
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'roshanadadegostar@gmail.com'
+EMAIL_HOST_PASSWORD = "qfov bmwr jqbd aqyz"
+DEFAULT_FROM_EMAIL = 'roshanadadegostar@gmail.com'
