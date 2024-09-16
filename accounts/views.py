@@ -35,3 +35,13 @@ def verify_otp(request):
         except User.DoesNotExist:
             return render(request, 'verify_otp.html', {'error': 'User with this email does not exist.'})
     return render(request, 'verify_otp.html')
+
+
+
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+@api_view(['GET'])
+def get_data(request):
+    data = {"message": "Hello from Django!"}
+    return Response(data)

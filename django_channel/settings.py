@@ -51,9 +51,12 @@ INSTALLED_APPS += [
 INSTALLED_APPS += [
     'rest_framework',    # Only for login purpose
     'django_admin_inline_paginator',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+
+ 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     
@@ -161,7 +164,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #         },
 #     },
 # }
-
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',

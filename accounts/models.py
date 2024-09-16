@@ -41,3 +41,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+import random
+import string
+from django.utils import timezone
+
+class OTPCode(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_valid(self):
+        expiration_time = timezone.now() - timezone.timedelta(minutes=5)  # OTP valid for 5 minutes
+        return self.created_at >= expiration_time
